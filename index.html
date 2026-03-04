@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Love 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+
+body{
+background:linear-gradient(135deg,#ffc1da,#ff9ecb);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+/* ===== CARD ===== */
+.card{
+width:360px;
+background:rgba(255,255,255,0.25);
+backdrop-filter:blur(20px);
+border-radius:30px;
+padding:30px;
+text-align:center;
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
+position:relative;
+}
+
+/* ===== AVATAR ===== */
+.avatar{
+width:140px;
+height:180px;
+border-radius:20px;
+object-fit:cover;
+margin-bottom:15px;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* ===== DOTS ===== */
+.dots{
+display:flex;
+justify-content:center;
+gap:10px;
+margin:15px 0;
+}
+
+.dot{
+width:14px;
+height:14px;
+border-radius:50%;
+border:2px solid #e91e63;
+}
+
+.dot.filled{
+background:#e91e63;
+}
+
+/* ===== KEYPAD ===== */
+.keypad{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-top:15px;
+}
+
+.key{
+background:rgba(255,255,255,0.6);
+border-radius:50%;
+height:60px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+color:#c2185b;
+cursor:pointer;
+transition:0.2s;
+}
+
+.key:active{
+transform:scale(0.9);
+}
+
+/* ===== SHAKE ===== */
+@keyframes shake{
+0%{transform:translateX(0);}
+25%{transform:translateX(-5px);}
+50%{transform:translateX(5px);}
+75%{transform:translateX(-5px);}
+100%{transform:translateX(0);}
+}
+
+.shake{
+animation:shake 0.4s;
+}
+
+/* ===== MENU ===== */
+.menu{
+    display:none; /* start hidden */
+    /* will be switched to grid via JS when unlocked */
+    grid-template-columns:repeat(3, 1fr);
+    gap:15px;
+    margin-top:20px;
+}
+
+.menu button{
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:rgba(255,255,255,0.7);
+    color:#c2185b;
+    font-weight:500;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    width:80px;
+    height:80px;
+}
+
+
+/* ===== MODAL ===== */
+.modal{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.4);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:white;
+width:350px;
+border-radius:20px;
+padding:25px;
+position:relative;
+text-align:center;
+}
+
+.close{
+position:absolute;
+right:15px;
+top:10px;
+cursor:pointer;
+}
+
+/* TYPEWRITER */
+#message{
+font-family:'Dancing Script',cursive;
+font-size:22px;
+color:#c2185b;
+min-height:120px;
+}
+
+/* FLOWER */
+.flower{
+    font-size:90px;
+    animation:spin 5s linear infinite;
+}
+
+@keyframes spin{
+    from{transform:rotate(0)}
+    to{transform:rotate(360deg)}
+}
+
+/* ===== PHOTO GALLERY ===== */
+.photo-gallery{
+    text-align:center;
+    max-width:100%;
+}
+
+.photo-viewer{
+    position:relative;
+    width:100%;
+    height:300px;
+    margin-bottom:20px;
+    overflow:hidden;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+.photo-display{
+    width:100%;
+    height:100%;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    transition:background-image 0.5s ease;
+}
+
+.photo-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(0,0,0,0.5);
+    color:white;
+    border:none;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:18px;
+    transition:0.3s;
+}
+
+.photo-nav:hover{
+    background:rgba(0,0,0,0.8);
+}
+
+.photo-nav.prev{
+    left:10px;
+}
+
+.photo-nav.next{
+    right:10px;
+}
+
+.photo-indicators{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin:15px 0;
+}
+
+.indicator{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#ddd;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.indicator.active{
+    background:#e91e63;
+}
+
+.photo-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(80px,1fr));
+    gap:10px;
+    margin-top:20px;
+    max-height:200px;
+    overflow-y:auto;
+}
+
+.photo-thumb{
+    width:100%;
+    height:60px;
+    object-fit:cover;
+    border-radius:8px;
+    cursor:pointer;
+    opacity:0.7;
+    transition:0.3s;
+    border:2px solid transparent;
+}
+
+.photo-thumb:hover{
+    opacity:1;
+}
+
+.photo-thumb.active{
+    opacity:1;
+    border-color:#e91e63;
+}
+
+.photo-counter{
+    margin-top:10px;
+    color:#666;
+    font-weight:500;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card" id="lockScreen">
+
+<img src="g3.jpg" class="avatar">
+
+<div class="dots">
+<div class="dot"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+</div>
+
+<div class="keypad">
+<div class="key">1</div>
+<div class="key">2</div>
+<div class="key">3</div>
+<div class="key">4</div>
+<div class="key">5</div>
+<div class="key">6</div>
+<div class="key">7</div>
+<div class="key">8</div>
+<div class="key">9</div>
+<div></div>
+<div class="key">0</div>
+<div class="key" id="delete">⌫</div>
+</div>
+
+<div class="menu" id="menu">
+    <button onclick="openMusic()">🎵 Nhạc</button>
+    <button onclick="openCard()">💌 Thiệp mừng</button>
+    <button onclick="openFlower()">🌹 Hoa</button>
+    <button onclick="openPhoto()">📷 Ảnh</button>
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal()">✖</span>
+<div id="modal-body"></div>
+</div>
+</div>
+
+<script>
+
+const correctPass="1204";
+let input="";
+
+const dots=document.querySelectorAll(".dot");
+const keys=document.querySelectorAll(".key");
+const lockScreen=document.getElementById("lockScreen");
+const menu=document.getElementById("menu");
+
+keys.forEach(key=>{
+key.addEventListener("click",()=>{
+if(key.id==="delete"){
+input=input.slice(0,-1);
+updateDots();
+return;
+}
+
+if(input.length<4){
+input+=key.textContent;
+updateDots();
+}
+
+if(input.length===4){
+checkPass();
+}
+});
+});
+
+function updateDots(){
+dots.forEach((dot,index)=>{
+dot.classList.toggle("filled",index<input.length);
+});
+}
+
+function checkPass(){
+    if(input===correctPass){
+        // unlock: show menu and hide keypad/dots/avatar
+        // use grid display for app-like layout
+        menu.style.display = "grid";
+        const keypad = document.querySelector(".keypad");
+        const dots = document.querySelector(".dots");
+        const avatar = document.querySelector(".avatar");
+        if(keypad) keypad.style.display = "none";
+        if(dots) dots.style.display = "none";
+        if(avatar) avatar.style.display = "none";
+        // change background to new image
+        lockScreen.style.background = "url('g4.jpg') center/cover no-repeat";
+    }else{
+        lockScreen.classList.add("shake");
+        setTimeout(()=>{
+            lockScreen.classList.remove("shake");
+            input="";
+            updateDots();
+        },400);
+    }
+}
+
+/* ===== THIỆP ===== */
+function openCard(){
+openModal('<div id="message"></div>');
+typeWriter("Gửi người con gái anh yêu 💖\n\nChúc em luôn hạnh phúc, xinh đẹp và mãi bên anh.\nAnh yêu em rất nhiều!");
+}
+
+function typeWriter(text){
+let i=0;
+const speed=50;
+const messageDiv=document.getElementById("message");
+messageDiv.innerHTML="";
+function typing(){
+if(i<text.length){
+messageDiv.innerHTML+=text.charAt(i);
+i++;
+setTimeout(typing,speed);
+}
+}
+typing();
+}
+
+/* ===== HOA ===== */
+function openFlower(){
+openModal('<div class="flower">🌹</div>');
+}
+
+
+
+/* ===== NHẠC ===== */
+function openMusic(){
+    const playlist = [
+        'Chỉ Cần Có Nhau.mp3',
+        'Có Nhau Trọn Đời.mp3',
+        'Không Sao Mà Em Đây Rồi.mp3',
+        'Một Nhà.mp3',
+        'Một Đời.mp3',
+        'Phép Màu (From Đàn Cá Gỗ Original Soundtrack).mp3',
+        'Ta Là Của Nhau.mp3',
+        'Từng Ngày Yêu Em.mp3',
+        'Yêu Em Rất Nhiều.mp3'
+    ];
+    
+    let currentTrack = 0;
+    
+    const playlistHtml = playlist.map((song, index) => 
+        `<div class="playlist-item" data-index="${index}" style="padding:10px; cursor:pointer; border-radius:8px; margin:5px 0; background:rgba(255,255,255,0.3); transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="this.style.background='rgba(255,255,255,0.3)'" onclick="playSong(${index})">${index+1}. ${song}</div>`
+    ).join('');
+    
+    const musicHtml = `
+        <h3>Nghe nhạc 🎶</h3>
+        <div id="now-playing" style="font-weight:500; color:#c2185b; margin-bottom:10px;">Bây giờ phát: <span id="track-name">${playlist[0]}</span></div>
+        <audio id="player" controls style="width:100%; margin-bottom:15px;">
+            <source src="music/${playlist[0]}" type="audio/mpeg">
+            Trình duyệt của bạn không hỗ trợ thẻ audio.
+        </audio>
+        <h4 style="margin-top:15px; margin-bottom:10px;">Danh sách nhạc:</h4>
+        <div style="max-height:250px; overflow-y:auto;">
+            ${playlistHtml}
+        </div>
+    `;
+    
+    openModal(musicHtml);
+    
+    // Make playSong function available globally
+    window.playSong = function(index){
+        currentTrack = index;
+        const player = document.getElementById('player');
+        const trackName = document.getElementById('track-name');
+        player.src = 'music/' + playlist[index];
+        trackName.textContent = playlist[index];
+        player.play();
+        
+        // Update highlight
+        document.querySelectorAll('.playlist-item').forEach((item, i) => {
+            if(i === index){
+                item.style.background = 'rgba(233, 30, 99, 0.4)';
+                item.style.fontWeight = 'bold';
+            } else {
+                item.style.background = 'rgba(255,255,255,0.3)';
+                item.style.fontWeight = 'normal';
+            }
+        });
+    };
+    
+    // Auto-highlight first track
+    window.playSong(0);
+}
+
+/* ===== ẢNH ===== */
+function openPhoto(){
+    const images = [
+        'images/14.jpg',
+        'images/11.jpg',
+        'images/19.jpg',
+        'images/12.jpg',
+        'images/13.jpg',
+        'images/15.jpg',
+        'images/16.jpg',
+        'images/17.jpg',
+        'images/18.jpg',
+    ];
+    
+    let currentIndex = 0;
+    
+    const indicatorsHtml = images.map((_, i) => 
+        `<div class="indicator ${i === 0 ? 'active' : ''}" onclick="changePhoto(${i})"></div>`
+    ).join('');
+    
+    const thumbsHtml = images.map((src, i) => 
+        `<img src="${src}" class="photo-thumb ${i === 0 ? 'active' : ''}" onclick="changePhoto(${i})">`
+    ).join('');
+    
+    const photoHtml = `
+        <h3>Photo Gallery📸</h3>
+        <div class="photo-gallery">
+            <div class="photo-viewer">
+                <div class="photo-display" id="photoDisplay" style="background-image:url('${images[0]}')"></div>
+                <button class="photo-nav prev" onclick="prevPhoto()">‹</button>
+                <button class="photo-nav next" onclick="nextPhoto()">›</button>
+            </div>
+            <div class="photo-indicators">
+                ${indicatorsHtml}
+            </div>
+            <div class="photo-grid">
+                ${thumbsHtml}
+            </div>
+            <div class="photo-counter" id="photoCounter">1 / ${images.length}</div>
+        </div>
+    `;
+    
+    openModal(photoHtml);
+    
+    // Make functions available globally
+    window.currentPhotoIndex = 0;
+    window.photoImages = images;
+    
+    window.changePhoto = function(index){
+        currentIndex = index;
+        window.currentPhotoIndex = index;
+        const display = document.getElementById('photoDisplay');
+        const counter = document.getElementById('photoCounter');
+        const indicators = document.querySelectorAll('.indicator');
+        const thumbs = document.querySelectorAll('.photo-thumb');
+        
+        display.style.backgroundImage = `url('${images[index]}')`;
+        counter.textContent = `${index + 1} / ${images.length}`;
+        
+        indicators.forEach((ind, i) => {
+            ind.classList.toggle('active', i === index);
+        });
+        
+        thumbs.forEach((thumb, i) => {
+            thumb.classList.toggle('active', i === index);
+        });
+    };
+    
+    window.nextPhoto = function(){
+        const nextIndex = (window.currentPhotoIndex + 1) % images.length;
+        window.changePhoto(nextIndex);
+    };
+    
+    window.prevPhoto = function(){
+        const prevIndex = (window.currentPhotoIndex - 1 + images.length) % images.length;
+        window.changePhoto(prevIndex);
+    };
+    
+    // Auto slideshow
+    window.photoInterval = setInterval(() => {
+        window.nextPhoto();
+    }, 3000);
+}
+
+function openModal(content){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modal-body").innerHTML=content;
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display="none";
+    // stop slideshow/music if running
+    if(typeof galleryInterval !== 'undefined'){
+        clearInterval(galleryInterval);
+        galleryInterval = undefined;
+    }
+    if(typeof window.photoInterval !== 'undefined'){
+        clearInterval(window.photoInterval);
+        window.photoInterval = undefined;
+    }
+    const audio = document.getElementById('galleryAudio');
+    if(audio){
+        audio.pause();
+        audio.currentTime = 0;
+    }
+}
+
+</script>
+</body>
+</html>
