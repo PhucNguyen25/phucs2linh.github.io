@@ -171,12 +171,6 @@ color:#c2185b;
 min-height:120px;
 }
 
-/* FLOWER */
-.flower{
-    font-size:90px;
-    animation:spin 5s linear infinite;
-}
-
 @keyframes spin{
     from{transform:rotate(0)}
     to{transform:rotate(360deg)}
@@ -289,6 +283,125 @@ min-height:120px;
     font-weight:500;
 }
 
+/* SCENE */
+
+.flower-scene{
+position:relative;
+height:350px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+
+/* ROSE */
+
+.rose{
+font-size:90px;
+transform:scale(0);
+animation:bloom 2s ease forwards;
+}
+
+/* BLOOM ANIMATION */
+
+@keyframes bloom{
+
+0%{
+transform:scale(0) rotate(-40deg);
+opacity:0;
+}
+
+60%{
+transform:scale(1.3) rotate(10deg);
+}
+
+100%{
+transform:scale(1);
+opacity:1;
+}
+
+}
+
+/* PETALS */
+
+.petal{
+position:absolute;
+top:-20px;
+font-size:20px;
+opacity:0.8;
+animation:fall 6s linear infinite;
+}
+
+@keyframes fall{
+
+0%{
+transform:translateY(-20px) rotate(0);
+opacity:1;
+}
+
+100%{
+transform:translateY(420px) rotate(360deg);
+opacity:0;
+}
+
+}
+
+/* HEARTS */
+
+.heart{
+position:absolute;
+bottom:-30px;
+font-size:18px;
+animation:floatHeart 5s ease-in-out infinite;
+opacity:0.8;
+}
+
+@keyframes floatHeart{
+
+0%{
+transform:translateY(0) scale(0.8);
+opacity:0;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+transform:translateY(-300px) scale(1.3);
+opacity:0;
+}
+
+}
+
+/* TEXT */
+
+.flower-text{
+
+margin-top:20px;
+font-family:'Dancing Script',cursive;
+font-size:24px;
+color:#c2185b;
+
+animation:fadeIn 3s ease;
+
+}
+
+@keyframes fadeIn{
+
+0%{
+opacity:0;
+transform:translateY(20px);
+}
+
+100%{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
 </style>
 </head>
 
@@ -342,7 +455,7 @@ min-height:120px;
 
 <script>
 
-const correctPass="1111";
+const correctPass="0412";
 let input="";
 
 const dots=document.querySelectorAll(".dot");
@@ -405,7 +518,7 @@ function checkPass(){
 /* ===== THIỆP ===== */
 function openCard(){
 openModal('<div id="message"></div>');
-typeWriter("Gửi người con gái anh yêu 💖\n\nChúc em luôn hạnh phúc, xinh đẹp và mãi bên anh.\nAnh yêu em rất nhiều!");
+typeWriter("Gửi em – người con gái anh yêu 💖\n\nChúc em một ngày 8/3 thật nhiều niềm vui,\nluôn xinh đẹp, hạnh phúc và rạng rỡ như nụ cười của em.\nCảm ơn em đã đến và làm cuộc sống của anh ý nghĩa hơn. ❤️");
 }
 
 function typeWriter(text){
@@ -425,7 +538,44 @@ typing();
 
 /* ===== HOA ===== */
 function openFlower(){
-openModal('<div class="flower">🌹</div>');
+
+let petals="";
+let hearts="";
+
+for(let i=0;i<15;i++){
+petals += `<div class="petal" style="
+left:${Math.random()*100}%;
+animation-delay:${Math.random()*4}s;
+">🌸</div>`;
+}
+
+for(let i=0;i<10;i++){
+hearts += `<div class="heart" style="
+left:${Math.random()*100}%;
+animation-delay:${Math.random()*3}s;
+">❤️</div>`;
+}
+
+openModal(`
+<div class="flower-scene">
+
+<div class="rose">🌹</div>
+
+<div class="petals">
+${petals}
+</div>
+
+<div class="hearts">
+${hearts}
+</div>
+
+<p class="flower-text">
+Tặng em bông hoa này ❤️
+</p>
+
+</div>
+`);
+
 }
 
 /* ===== CẬP NHẬT GIAO DIỆN NHẠC ===== */
