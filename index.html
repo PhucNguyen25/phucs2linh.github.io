@@ -101,26 +101,38 @@ animation:shake 0.4s;
 .menu{
     display:none; /* start hidden */
     /* will be switched to grid via JS when unlocked */
-    grid-template-columns:repeat(3, 1fr);
+    grid-template-columns:1fr;
     gap:15px;
     margin-top:20px;
+    margin-left:auto;
+    margin-right:auto;
+    width:fit-content;
 }
 
 .menu button{
-    padding:12px;
+    padding:15px;
     border:none;
-    border-radius:20px;
-    background:rgba(255,255,255,0.7);
+    border-radius:25px;
+    background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,192,203,0.3));
     color:#c2185b;
-    font-weight:500;
+    font-weight:600;
     cursor:pointer;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    font-size:18px;
-    width:80px;
-    height:80px;
+    font-size:28px;
+    width:240px;
+    height:120px;
+    gap:8px;
+    box-shadow:0 8px 20px rgba(201, 24, 91, 0.15);
+    transition:0.3s;
+}
+
+.menu button:hover{
+    transform:translateY(-5px);
+    box-shadow:0 12px 30px rgba(201, 24, 91, 0.25);
+    background:linear-gradient(135deg, rgba(255,255,255,1), rgba(255,192,203,0.5));
 }
 
 
@@ -309,13 +321,16 @@ min-height:120px;
 </div>
 
 <div class="menu" id="menu">
-    <button onclick="openMusic()">🎵 Nhạc</button>
-    <button onclick="openCard()">💌 Thiệp mừng</button>
-    <button onclick="openFlower()">🌹 Hoa</button>
-    <button onclick="openPhoto()">📷 Ảnh</button>
+    <button onclick="openMusic()">🎵 Music</button>
+    <button onclick="openCard()">💌 Leter</button>
+    <button onclick="openFlower()">🌹 Gift</button>
+    <button onclick="openPhoto()">📷 Photo</button>
 </div>
 
 </div>
+
+<!-- PERSISTENT AUDIO PLAYER (không bị xoá khi đổi menu) -->
+<audio id="persistentPlayer" style="display:none;"></audio>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
@@ -327,7 +342,7 @@ min-height:120px;
 
 <script>
 
-const correctPass="1204";
+const correctPass="1111";
 let input="";
 
 const dots=document.querySelectorAll(".dot");
@@ -361,6 +376,9 @@ dot.classList.toggle("filled",index<input.length);
 }
 
 function checkPass(){
+    // keep menu hidden unless passcode correct
+    menu.style.display = "none";
+
     if(input===correctPass){
         // unlock: show menu and hide keypad/dots/avatar
         // use grid display for app-like layout
@@ -371,8 +389,9 @@ function checkPass(){
         if(keypad) keypad.style.display = "none";
         if(dots) dots.style.display = "none";
         if(avatar) avatar.style.display = "none";
-        // change background to new image
-        lockScreen.style.background = "url('g4.jpg') center/cover no-repeat";
+        // change background to elegant gradient
+        lockScreen.style.background = "linear-gradient(135deg, #ffd6e8 0%, #ffe4f0 50%, #fff0f5 100%)";
+        lockScreen.style.boxShadow = "inset 0 0 30px rgba(255, 105, 180, 0.1)";
     }else{
         lockScreen.classList.add("shake");
         setTimeout(()=>{
@@ -409,23 +428,70 @@ function openFlower(){
 openModal('<div class="flower">🌹</div>');
 }
 
-
+/* ===== CẬP NHẬT GIAO DIỆN NHẠC ===== */
+function updateMusicUI(){
+    const persistentPlayer = document.getElementById('persistentPlayer');
+    const playlist = window.musicPlaylist || [];
+    
+    // Cập nhật tên bài hát
+    const trackName = document.getElementById('track-name');
+    if(persistentPlayer.src && playlist.length > 0){
+        // lấy phần cuối của URL và giải mã
+        let currentSrc = persistentPlayer.src.split('/').pop() || '';
+        try {
+            currentSrc = decodeURIComponent(currentSrc);
+        } catch(e) {
+            // nếu decode thất bại thì giữ nguyên
+        }
+        const currentIndex = playlist.findIndex(song => song === currentSrc);
+        if(currentIndex !== -1){
+            if(trackName) trackName.textContent = playlist[currentIndex];
+            window.currentTrackIndex = currentIndex;
+            
+            // Highlight bài đang phát
+            document.querySelectorAll('.playlist-item').forEach((item, i) => {
+                if(i === currentIndex){
+                    item.style.background = 'rgba(233, 30, 99, 0.4)';
+                    item.style.fontWeight = 'bold';
+                } else {
+                    item.style.background = 'rgba(255,255,255,0.3)';
+                    item.style.fontWeight = 'normal';
+                }
+            });
+        } else {
+            if(trackName) trackName.textContent = 'Chưa chọn bài nào';
+        }
+    } else {
+        if(trackName) trackName.textContent = 'Chưa chọn bài nào';
+    }
+    
+    // Cập nhật nút play/pause
+    const playBtn = document.querySelector('button[onclick="togglePlayPause()"]');
+    if(playBtn){
+        playBtn.textContent = persistentPlayer.paused ? '▶ Play' : '⏸ Pause';
+    }
+}
 
 /* ===== NHẠC ===== */
 function openMusic(){
     const playlist = [
-        'Chỉ Cần Có Nhau.mp3',
-        'Có Nhau Trọn Đời.mp3',
-        'Không Sao Mà Em Đây Rồi.mp3',
-        'Một Nhà.mp3',
-        'Một Đời.mp3',
-        'Phép Màu (From Đàn Cá Gỗ Original Soundtrack).mp3',
-        'Ta Là Của Nhau.mp3',
-        'Từng Ngày Yêu Em.mp3',
-        'Yêu Em Rất Nhiều.mp3'
+        'Phép Màu',
+        'Một Đời',
+        'Một Nhà',
+        'Không Sao Mà Em Đây Rồi',
+        'Có Nhau Trọn Đời',
+        'Chỉ Cần Có Nhau',
+        'Ta Là Của Nhau',
+        'Từng Ngày Yêu Em',
+        'Yêu Em Rất Nhiều'
     ];
     
-    let currentTrack = 0;
+    let currentTrack = window.currentTrackIndex || 0;
+    const persistentPlayer = document.getElementById('persistentPlayer');
+    
+    // Lưu globally để updateMusicUI() có thể truy cập
+    window.musicPlaylist = playlist;
+    window.currentTrackIndex = currentTrack;
     
     const playlistHtml = playlist.map((song, index) => 
         `<div class="playlist-item" data-index="${index}" style="padding:10px; cursor:pointer; border-radius:8px; margin:5px 0; background:rgba(255,255,255,0.3); transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="this.style.background='rgba(255,255,255,0.3)'" onclick="playSong(${index})">${index+1}. ${song}</div>`
@@ -433,11 +499,15 @@ function openMusic(){
     
     const musicHtml = `
         <h3>Nghe nhạc 🎶</h3>
-        <div id="now-playing" style="font-weight:500; color:#c2185b; margin-bottom:10px;">Bây giờ phát: <span id="track-name">${playlist[0]}</span></div>
-        <audio id="player" controls style="width:100%; margin-bottom:15px;">
-            <source src="music/${playlist[0]}" type="audio/mpeg">
-            Trình duyệt của bạn không hỗ trợ thẻ audio.
-        </audio>
+        <div id="now-playing" style="font-weight:500; color:#c2185b; margin-bottom:10px;">Bây giờ phát: <span id="track-name">Chưa chọn bài nào</span></div>
+        <div id="progress-container" style="width:100%; margin-bottom:15px;">
+            <input type="range" id="progress-bar" min="0" max="100" value="0" style="width:100%; cursor:pointer; height:6px;">
+        </div>
+        <div id="audio-controls" style="width:100%; margin-bottom:15px; display:flex; justify-content:center; gap:15px;">
+            <button onclick="playPrevTrack()" style="padding:8px 12px; border:none; border-radius:5px; background:#e91e63; color:white; cursor:pointer; font-weight:bold;">⏮</button>
+            <button onclick="togglePlayPause()" style="padding:8px 15px; border:none; border-radius:5px; background:#e91e63; color:white; cursor:pointer; font-weight:bold;">▶ Play</button>
+            <button onclick="playNextTrack()" style="padding:8px 12px; border:none; border-radius:5px; background:#e91e63; color:white; cursor:pointer; font-weight:bold;">⏭</button>
+        </div>
         <h4 style="margin-top:15px; margin-bottom:10px;">Danh sách nhạc:</h4>
         <div style="max-height:250px; overflow-y:auto;">
             ${playlistHtml}
@@ -449,11 +519,15 @@ function openMusic(){
     // Make playSong function available globally
     window.playSong = function(index){
         currentTrack = index;
-        const player = document.getElementById('player');
+        window.currentTrackIndex = index;
         const trackName = document.getElementById('track-name');
-        player.src = 'music/' + playlist[index];
-        trackName.textContent = playlist[index];
-        player.play();
+        persistentPlayer.src = 'music/' + playlist[index];
+        if(trackName) trackName.textContent = playlist[index];
+        persistentPlayer.play();
+        
+        // Cập nhật nút play/pause
+        const playBtn = document.querySelector('button[onclick="togglePlayPause()"]');
+        if(playBtn) playBtn.textContent = '⏸ Pause';
         
         // Update highlight
         document.querySelectorAll('.playlist-item').forEach((item, i) => {
@@ -467,8 +541,62 @@ function openMusic(){
         });
     };
     
-    // Auto-highlight first track
-    window.playSong(0);
+    // Previous track
+    window.playPrevTrack = function(){
+        const playlist = window.musicPlaylist || [];
+        window.currentTrackIndex = (window.currentTrackIndex - 1 + playlist.length) % playlist.length;
+        window.playSong(window.currentTrackIndex);
+    };
+    
+    // Toggle play/pause
+    window.togglePlayPause = function(){
+        const persistentPlayer = document.getElementById('persistentPlayer');
+        const playBtn = document.querySelector('button[onclick="togglePlayPause()"]');
+        
+        if(persistentPlayer.paused){
+            persistentPlayer.play();
+            if(playBtn) playBtn.textContent = '⏸ Pause';
+        } else {
+            persistentPlayer.pause();
+            if(playBtn) playBtn.textContent = '▶ Play';
+        }
+    };
+    
+    // Next track
+    window.playNextTrack = function(){
+        const playlist = window.musicPlaylist || [];
+        window.currentTrackIndex = (window.currentTrackIndex + 1) % playlist.length;
+        window.playSong(window.currentTrackIndex);
+    };
+    
+    // Update progress bar
+    persistentPlayer.addEventListener('timeupdate', () => {
+        const progressBar = document.getElementById('progress-bar');
+        if(progressBar && persistentPlayer.duration){
+            progressBar.value = (persistentPlayer.currentTime / persistentPlayer.duration) * 100;
+        }
+    });
+    
+    // Seek on progress bar click
+    const progressBar = document.getElementById('progress-bar');
+    if(progressBar){
+        progressBar.addEventListener('click', (e) => {
+            const percent = e.offsetX / progressBar.offsetWidth;
+            persistentPlayer.currentTime = percent * persistentPlayer.duration;
+        });
+    }
+    
+    // Auto play next track when current track ends
+    persistentPlayer.addEventListener('ended', () => {
+        const playlist = window.musicPlaylist || [];
+        window.currentTrackIndex = (window.currentTrackIndex + 1) % playlist.length;
+        window.playSong(window.currentTrackIndex);
+    });
+    
+    // Cập nhật giao diện theo trạng thái hiện tại của nhạc
+    updateMusicUI();
+    
+    // Không tự động phát nhạc, để người dùng chọn bài từ danh sách
 }
 
 /* ===== ẢNH ===== */
@@ -562,7 +690,7 @@ document.getElementById("modal-body").innerHTML=content;
 
 function closeModal(){
     document.getElementById("modal").style.display="none";
-    // stop slideshow/music if running
+    // stop slideshow if running (nhưng KHÔNG dừng nhạc)
     if(typeof galleryInterval !== 'undefined'){
         clearInterval(galleryInterval);
         galleryInterval = undefined;
@@ -571,11 +699,7 @@ function closeModal(){
         clearInterval(window.photoInterval);
         window.photoInterval = undefined;
     }
-    const audio = document.getElementById('galleryAudio');
-    if(audio){
-        audio.pause();
-        audio.currentTime = 0;
-    }
+    // Không dừng persistentPlayer - để nhạc tiếp tục phát
 }
 
 </script>
